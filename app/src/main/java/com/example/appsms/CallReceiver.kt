@@ -14,13 +14,11 @@ class CallReceiver : BroadcastReceiver() {
             val state = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
             val incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
 
-            // Importante: El número puede llegar nulo en el primer "evento" del sistema
             if (state == TelephonyManager.EXTRA_STATE_RINGING && incomingNumber != null) {
                 val prefs = context.getSharedPreferences("AppSMSPrefs", Context.MODE_PRIVATE)
                 val targetNumber = prefs.getString("targetNumber", "") ?: ""
                 val message = prefs.getString("autoMessage", "") ?: ""
 
-                // Limpiamos ambos números para que la comparación sea exitosa
                 val cleanIncoming = incomingNumber.replace(Regex("[^0-9]"), "")
                 val cleanTarget = targetNumber.replace(Regex("[^0-9]"), "")
 
