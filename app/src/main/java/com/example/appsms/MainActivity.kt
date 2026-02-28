@@ -40,7 +40,6 @@ fun SMSAutoResponderScreen() {
     var targetNumber by remember { mutableStateOf(prefs.getString("targetNumber", "") ?: "") }
     var autoMessage by remember { mutableStateOf(prefs.getString("autoMessage", "") ?: "") }
 
-    // Lista de permisos completa (Incluye Notificaciones para Android 13+)
     val permissions = mutableListOf(
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.READ_CALL_LOG,
