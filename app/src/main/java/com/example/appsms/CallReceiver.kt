@@ -14,17 +14,22 @@ class CallReceiver : BroadcastReceiver() {
             val state = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
             val incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
 
+            // Si el telefono esta sonando y tenemos el numero de quien llama
             if (state == TelephonyManager.EXTRA_STATE_RINGING && incomingNumber != null) {
+                // Se cargan las preferencias
                 val prefs = context.getSharedPreferences("AppSMSPrefs", Context.MODE_PRIVATE)
                 val targetNumber = prefs.getString("targetNumber", "") ?: ""
                 val message = prefs.getString("autoMessage", "") ?: ""
 
+                // Se limpia
                 val cleanIncoming = incomingNumber.replace(Regex("[^0-9]"), "")
                 val cleanTarget = targetNumber.replace(Regex("[^0-9]"), "")
 
+                // Si coincide con el configurado se envia el SMS
                 if (cleanTarget.isNotEmpty() && cleanIncoming.contains(cleanTarget)) {
                     try {
                         val smsManager = context.getSystemService(SmsManager::class.java)
+                        // Envia el mensaje de texto automaticamente
                         smsManager.sendTextMessage(incomingNumber, null, message, null, null)
                         Toast.makeText(context, "Enviando respuesta a $incomingNumber...", Toast.LENGTH_LONG).show()
                     } catch (e: Exception) {

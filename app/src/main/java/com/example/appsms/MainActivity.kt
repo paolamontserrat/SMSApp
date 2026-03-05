@@ -36,20 +36,21 @@ class MainActivity : ComponentActivity() {
 fun SMSAutoResponderScreen() {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("AppSMSPrefs", Context.MODE_PRIVATE) }
-
+    // Variables que guardan el numero y el mensaje
     var targetNumber by remember { mutableStateOf(prefs.getString("targetNumber", "") ?: "") }
     var autoMessage by remember { mutableStateOf(prefs.getString("autoMessage", "") ?: "") }
-
+    // permisos necesarios
     val permissions = mutableListOf(
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.READ_CALL_LOG,
         Manifest.permission.SEND_SMS
     ).apply {
+        // permiso de notificaciones
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             add(Manifest.permission.POST_NOTIFICATIONS)
         }
     }.toTypedArray()
-
+    // solicitar los permisos y mostrar un mensaje si alguno es rechazado
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
@@ -57,21 +58,18 @@ fun SMSAutoResponderScreen() {
             Toast.makeText(context, "Acepta todos los permisos para que la app funcione", Toast.LENGTH_LONG).show()
         }
     }
-
+    // lanza la solicitud de permisos al mostrarse la pantalla por primera vez
     LaunchedEffect(Unit) {
         launcher.launch(permissions)
     }
-
     Column(modifier = Modifier.padding(24.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text("Configurar Auto-Respuesta", style = MaterialTheme.typography.headlineSmall)
-
         OutlinedTextField(
             value = targetNumber,
             onValueChange = { targetNumber = it },
             label = { Text("Número exacto (ej: 4451826054)") },
             modifier = Modifier.fillMaxWidth()
         )
-
         OutlinedTextField(
             value = autoMessage,
             onValueChange = { autoMessage = it },
@@ -79,7 +77,6 @@ fun SMSAutoResponderScreen() {
             modifier = Modifier.fillMaxWidth(),
             minLines = 3
         )
-
         Button(
             onClick = {
                 prefs.edit().putString("targetNumber", targetNumber).putString("autoMessage", autoMessage).apply()
@@ -89,7 +86,6 @@ fun SMSAutoResponderScreen() {
         ) {
             Text("Guardar y Activar")
         }
-
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Text(
                 text = "Escribe el número tal cual aparece en la llamada, o solo los últimos 10 dígitos.",
